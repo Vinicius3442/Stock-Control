@@ -12,7 +12,7 @@ $isAdmin = ($_SESSION['nivel_acesso'] === 'admin');
 $iniciais = strtoupper(substr($_SESSION['nome'], 0, 2));
 
 // Buscar todos os produtos
-$stmt =$pdo->query("SELECT * FROM produtos ORDER BY id DESC");
+$stmt = $pdo->query("SELECT * FROM produtos WHERE status = 'ativo' ORDER BY id DESC");
 $produtos =$stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Cálculos das métricas
