@@ -59,6 +59,7 @@ if (!$produto) {
     <meta charset="UTF-8">
     <title>StockControl - Editar Produto</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <div class="dashboard-container">

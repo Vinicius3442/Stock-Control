@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>StockControl - Recuperar Senha</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>

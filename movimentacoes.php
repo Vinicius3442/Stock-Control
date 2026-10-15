@@ -9,13 +9,16 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $isAdmin = ($_SESSION['nivel_acesso'] === 'admin');
 $iniciais = strtoupper(substr($_SESSION['nome'], 0, 2));
+$stmt_user = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = ?");
+$stmt_user->execute([$_SESSION['usuario_id']]);
+$foto_perfil = $stmt_user->fetchColumn();
 
 // Buscar produtos para o select do filtro
 $stmt_produtos = $pdo->query("SELECT id, nome FROM produtos ORDER BY nome ASC");
 $produtos_lista = $stmt_produtos->fetchAll(PDO::FETCH_ASSOC);
 
 // Lógica de filtragem
-$filtro_produto_id = isset($_GET['produto_id']) ? (int)$_GET['produto_id'] : '';
+$filtro_produto_id = isset($_GET['produto_id']) ? (int) $_GET['produto_id'] : '';
 $where = "";
 $params = [];
 
@@ -41,11 +44,14 @@ $total_movimentacoes = count($movimentacoes);
 ?>
 <!DOCTYPE html>
 <html lang="pt-PT">
+
 <head>
     <meta charset="UTF-8">
     <title>StockControl - Histórico de Movimentações</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Header -->
@@ -60,16 +66,33 @@ $total_movimentacoes = count($movimentacoes);
                     <a href="movimentacoes.php" class="active">Movimentações</a>
                 </nav>
             </div>
-            
+
             <div class="topbar-right">
-                <div class="user-profile">
-                    <div class="avatar"><?= $iniciais ?></div>
-                    <div class="user-info">
-                        <span><?= htmlspecialchars($_SESSION['nome']) ?></span>
-                        <span class="user-role"><?= ucfirst($_SESSION['nivel_acesso']) ?></span>
+                <?php if (isset($isAdmin) && $isAdmin && basename($_SERVER['PHP_SELF']) == 'painel.php'): ?>
+                    <a href="./novo-produto.php" class="btn-new"><i class="ph ph-plus"></i> Novo produto</a>
+                <?php endif; ?>
+
+                <a href="perfil.php" style="text-decoration: none;">
+                    <div class="user-profile" style="transition: transform 0.2s ease; cursor: pointer;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+
+                        <div class="avatar">
+                            <?php if (!empty($foto_perfil)): ?>
+                                <img src="uploads/<?= htmlspecialchars($foto_perfil) ?>"
+                                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                            <?php else: ?>
+                                <?= $iniciais ?>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="user-info">
+                            <span><?= htmlspecialchars($_SESSION['nome']) ?></span>
+                            <span class="user-role"><?= ucfirst($_SESSION['nivel_acesso']) ?></span>
+                        </div>
                     </div>
-                </div>
-                <a href="logout.php" class="logout-link">Sair &nearr;</a>
+                </a>
+
+                <a href="logout.php" class="logout-link"><i class="ph ph-sign-out"></i> Sair</a>
             </div>
         </header>
 
@@ -93,7 +116,8 @@ $total_movimentacoes = count($movimentacoes);
                     </select>
                 </form>
 
-                <a href="painel.php" class="btn-primary" style="text-decoration: none; padding: 12px 24px; font-weight: 500;">+ Nova movimentação</a>
+                <a href="painel.php" class="btn-primary"
+                    style="text-decoration: none; padding: 12px 24px; font-weight: 500;">+ Nova movimentação</a>
             </div>
 
             <div class="history-section">
@@ -109,32 +133,33 @@ $total_movimentacoes = count($movimentacoes);
                     </thead>
                     <tbody>
                         <?php if ($total_movimentacoes > 0): ?>
-                            <?php foreach ($movimentacoes as $mov): 
+                            <?php foreach ($movimentacoes as $mov):
                                 $data_formatada = date('d M. Y • H:i', strtotime($mov['criado_em']));
                                 // Traduzir meses para português
                                 $meses_en = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                                 $meses_pt = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
                                 $data_formatada = str_replace($meses_en, $meses_pt, $data_formatada);
-                                
+
                                 $sinal = $mov['tipo'] === 'entrada' ? '+ ' : '- ';
                                 $tipo_capitalizado = ucfirst($mov['tipo']);
-                            ?>
-                            <tr>
-                                <td><?= $data_formatada ?></td>
-                                <td><?= $tipo_capitalizado ?></td>
-                                <td><?= $sinal . $mov['quantidade'] ?></td>
-                                <td><?= htmlspecialchars($mov['usuario_nome']) ?></td>
-                                <td><?= htmlspecialchars($mov['observacao']) ?: '-' ?></td>
-                            </tr>
+                                ?>
+                                <tr>
+                                    <td><?= $data_formatada ?></td>
+                                    <td><?= $tipo_capitalizado ?></td>
+                                    <td><?= $sinal . $mov['quantidade'] ?></td>
+                                    <td><?= htmlspecialchars($mov['usuario_nome']) ?></td>
+                                    <td><?= htmlspecialchars($mov['observacao']) ?: '-' ?></td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" style="text-align: center; color: #A8A8B3;">Nenhuma movimentação registada para este filtro.</td>
+                                <td colspan="5" style="text-align: center; color: #A8A8B3;">Nenhuma movimentação registada
+                                    para este filtro.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
-                
+
                 <div style="margin-top: 32px; font-size: 0.75rem; color: #52525B;">
                     <?= $total_movimentacoes ?> movimentações • Histórico completo disponível.
                 </div>
@@ -142,4 +167,5 @@ $total_movimentacoes = count($movimentacoes);
         </main>
     </div>
 </body>
+
 </html>
