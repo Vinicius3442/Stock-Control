@@ -76,28 +76,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <div class="dashboard-container">
-        <!-- Header -->
+        <!-- Header Principal Padronizado -->
         <header class="topbar">
             <div class="topbar-left">
-                <div class="logo" style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 24px; height: 24px; background: #9D7AFF; border-radius: 4px;"></div>
+                <div class="logo"
+                    style="display: flex; align-items: center; gap: 12px; transition: transform 0.3s ease; cursor: pointer;"
+                    onclick="window.location.href='painel.php'" onmouseover="this.style.transform='scale(1.05)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="40 35 120 135" style="width: 28px;">
+                        <polygon points="100,100 100,164 45,132 45,68" fill="#6D28D9" />
+                        <polygon points="100,100 155,68 155,132 100,164" fill="#8B5CF6" />
+                        <polygon points="100,36 155,68 100,100 45,68" fill="#A78BFA" />
+                        <polyline points="80,47 135,79.5 135,120" stroke="#F5F3FF" stroke-width="4" fill="none"
+                            stroke-linejoin="round" stroke-linecap="round" />
+                    </svg>
                     <strong style="font-size: 1.25rem;">StockControl</strong>
                 </div>
                 <nav class="nav-links">
                     <a href="painel.php" class="active">Produtos</a>
-                    <a href="./Movimentações">Movimentações</a>
+                    <a href="movimentacoes.php">Movimentações</a>
                 </nav>
             </div>
 
             <div class="topbar-right">
-                <div class="user-profile">
-                    <div class="avatar"><?= $iniciais ?></div>
-                    <div class="user-info">
-                        <span><?= htmlspecialchars($_SESSION['nome']) ?></span>
-                        <span class="user-role"><?= ucfirst($_SESSION['nivel_acesso']) ?></span>
+                <a href="perfil.php" style="text-decoration: none; display: block;">
+                    <div class="user-profile" style="transition: transform 0.2s ease; cursor: pointer;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <div class="avatar"
+                            style="background-color: rgba(157, 122, 255, 0.2); color: #9D7AFF; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <?php
+                            // Busca rápida da foto para o header
+                            $stmt_user = $pdo->prepare("SELECT foto_perfil FROM usuarios WHERE id = ?");
+                            $stmt_user->execute([$_SESSION['usuario_id']]);
+                            $foto_header = $stmt_user->fetchColumn();
+
+                            if (!empty($foto_header)): ?>
+                                <img src="uploads/<?= htmlspecialchars($foto_header) ?>"
+                                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                            <?php else: ?>
+                                <?= strtoupper(substr($_SESSION['nome'], 0, 2)) ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="user-info">
+                            <span><?= htmlspecialchars($_SESSION['nome']) ?></span>
+                            <span class="user-role"><?= ucfirst($_SESSION['nivel_acesso']) ?></span>
+                        </div>
                     </div>
-                </div>
-                <a href="logout.php" class="logout-link">Sair &nearr;</a>
+                </a>
+                <a href="logout.php" class="logout-link"><i class="ph ph-sign-out"></i> Sair</a>
             </div>
         </header>
 
