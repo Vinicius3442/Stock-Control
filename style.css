@@ -1222,25 +1222,33 @@ a.btn-primary:hover {
     border-top: 1px solid #29292E;
     padding-top: 16px;
     margin-top: auto;
-    overflow: hidden; /* Importante para a animação */
+    /* Retirado o overflow: hidden; para permitir a flutuação do menu */
 }
 
-/* Oculta as ações primárias inicialmente */
+/* Transforma as ações extras num menu flutuante (estilo tooltip) */
 .product-actions-hover {
     position: absolute;
-    right: 0;
-    bottom: 16px;
+    right: -4px;
+    bottom: 52px; /* Sobe o menu para libertar o espaço do botão "Movimentar" */
     display: flex;
     gap: 8px;
-    background-color: #181820; /* Fundo igual ao cartão para sobrepor o texto do stock */
-    padding-left: 12px;
-    transform: translateX(110%); /* Esconde à direita */
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #181820; 
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #29292E;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6); /* Sombra acentuada para flutuar */
+    opacity: 0;
+    transform: translateY(10px); /* Surge de baixo para cima */
+    pointer-events: none; /* Impede cliques acidentais quando está invisível */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
 }
 
-/* Mostra as ações ao passar o rato no cartão */
+/* Revela o menu flutuante ao passar o rato no cartão */
 .product-card:hover .product-actions-hover {
-    transform: translateX(0);
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 /* Estilo para os novos botões de ícone (Ações secundárias: Editar/Excluir) */
