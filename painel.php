@@ -128,22 +128,24 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
             </section>
 
             <!-- Barra de Busca e Filtro (Centralizada e Roxinha) -->
-        <section class="filters-section">
-            <div class="filters-left"></div> 
-            
-            <div class="filters-center">
-                <div class="search-container">
-                    <i class="ph ph-magnifying-glass search-icon" id="icon-lupa"></i>
-                    <i class="ph ph-spinner-gap search-icon loading-spinner" id="icon-spinner" style="display: none;"></i>
-                    <input type="text" id="input-pesquisa" class="search-input" placeholder="Buscar por nome ou descrição...">
+            <section class="filters-section">
+                <div class="filters-left"></div>
+
+                <div class="filters-center">
+                    <div class="search-container">
+                        <i class="ph ph-magnifying-glass search-icon" id="icon-lupa"></i>
+                        <i class="ph ph-spinner-gap search-icon loading-spinner" id="icon-spinner"
+                            style="display: none;"></i>
+                        <input type="text" id="input-pesquisa" class="search-input"
+                            placeholder="Buscar por nome ou descrição...">
+                    </div>
                 </div>
-            </div>
-            
-            <div class="filters-right">
-                <button class="toggle-active"><i class="ph ph-funnel"></i> Somente ativos</button>
-            </div>
-        </section>
-            
+
+                <div class="filters-right">
+                    <button class="toggle-active"><i class="ph ph-funnel"></i> Somente ativos</button>
+                </div>
+            </section>
+
 
             <!-- Grid de Produtos Dinâmico -->
             <section class="products-grid">
@@ -205,8 +207,31 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
                     </div>
                 <?php endforeach; ?>
             </section>
+            <div id="empty-state"
+                style="display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.3s ease-out; margin: 0 auto; grid-column: 1 / -1;">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" stroke-width="6" stroke-linecap="round"
+                    stroke-linejoin="round" style="margin-bottom: 16px;">
+                    <!-- Rosto (Fundo transparente) -->
+                    <circle cx="50" cy="50" r="40" stroke="#EF4444" opacity="0.2" />
+                    <!-- Olhinhos -->
+                    <circle cx="35" cy="40" r="5" fill="#EF4444" stroke="none" />
+                    <circle cx="65" cy="40" r="5" fill="#EF4444" stroke="none" />
+                    <!-- Boquinha animada (Vetor Morphing) -->
+                    <path d="M 35 65 Q 50 65 65 65" stroke="#EF4444">
+                        <animate attributeName="d"
+                            values="M 35 65 Q 50 65 65 65; M 35 70 Q 50 45 65 70; M 35 65 Q 50 65 65 65" dur="1.5s"
+                            repeatCount="indefinite" />
+                    </path>
+                </svg>
+                <h3 style="color: #EF4444; font-size: 1.25rem; margin-bottom: 8px;">Nenhum produto encontrado</h3>
+                <p style="color: #A8A8B3; font-size: 0.875rem;">Sua busca não retornou resultados. Tente procurar por
+                    outro
+                    termo.</p>
+            </div>
+
         </main>
     </div>
+
 
     <!-- MODAL 1: Lista de Comentários -->
     <div class="modal-overlay" id="modal-lista-comentarios" style="display: none;">
@@ -350,240 +375,7 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
         </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT DOS MODAIS -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const inputPesquisa = document.getElementById('input-pesquisa');
-            const iconLupa = document.getElementById('icon-lupa');
-            const iconSpinner = document.getElementById('icon-spinner');
-            let timerPesquisa;
-
-            if (inputPesquisa) {
-                inputPesquisa.addEventListener('input', () => {
-                    // Esconde a lupa e mostra o spinner a girar
-                    iconLupa.style.display = 'none';
-                    iconSpinner.style.display = 'block';
-
-                    clearTimeout(timerPesquisa);
-
-                    timerPesquisa = setTimeout(() => {
-                        // Devolve a lupa
-                        iconSpinner.style.display = 'none';
-                        iconLupa.style.display = 'block';
-                        
-                        // LÓGICA DE FILTRAGEM DINÂMICA
-                        const termo = inputPesquisa.value.toLowerCase();
-                        const cartoes = document.querySelectorAll('.product-card');
-
-                        cartoes.forEach(cartao => {
-                            const titulo = cartao.querySelector('h4').textContent.toLowerCase();
-                            const desc = cartao.querySelector('.product-details p').textContent.toLowerCase();
-
-                            // Verifica se o texto digitado existe no nome ou na descrição
-                            if (titulo.includes(termo) || desc.includes(termo)) {
-                                // Se sim, mostra o cartão com animação suave de entrada
-                                cartao.style.display = 'flex';
-                                setTimeout(() => {
-                                    cartao.style.opacity = '1';
-                                    cartao.style.transform = 'scale(1)';
-                                }, 10);
-                            } else {
-                                // Se não, oculta o cartão encolhendo-o suavemente
-                                cartao.style.opacity = '0';
-                                cartao.style.transform = 'scale(0.8)';
-                                setTimeout(() => {
-                                    // Remove do fluxo do ecrã após a animação (300ms) terminar
-                                    if (cartao.style.opacity === '0') {
-                                        cartao.style.display = 'none';
-                                    }
-                                }, 300); 
-                            }
-                        });
-                    }, 600); // 600ms de "falso carregamento" para o efeito visual ficar agradável
-                });
-            }
-
-            // Animação de clique no botão "Somente ativos"
-            const btnFiltro = document.querySelector('.toggle-active');
-            if (btnFiltro) {
-                btnFiltro.addEventListener('click', function() {
-                    this.classList.toggle('ativo');
-                    if(this.classList.contains('ativo')) {
-                        // Fica Verde para indicar que está ativado
-                        this.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
-                        this.style.borderColor = '#10B981';
-                        this.style.color = '#10B981';
-                    } else {
-                        // Volta ao cinzento original
-                        this.style.backgroundColor = '#181820';
-                        this.style.borderColor = '#29292E';
-                        this.style.color = '#A8A8B3';
-                    }
-                });
-            }
-        });
-        
-        document.addEventListener("DOMContentLoaded", () => {
-            const counters = document.querySelectorAll('.counter');
-            const speed = 50; // Quanto menor, mais rápido a contagem
-
-            counters.forEach(counter => {
-                const animate = () => {
-                    const value = +counter.getAttribute('data-target');
-                    const data = +counter.innerText;
-                    const time = value / speed;
-
-                    if (data < value) {
-                        counter.innerText = Math.ceil(data + time);
-                        setTimeout(animate, 20); // Intervalo de atualização (ms)
-                    } else {
-                        counter.innerText = value;
-                        // Adiciona a classe que dá a "crescidinha" roxa e volta
-                        counter.classList.add('pop');
-                    }
-                }
-                animate();
-            });
-        });
-
-        let produtoAtualId = null;
-        let produtoAtualNome = '';
-
-        function fecharModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        // --- Lógica de Excluir Produto ---
-        function abrirModalExcluir(id, nome) {
-            document.getElementById('modal-excluir-produto-nome').textContent = nome;
-            document.getElementById('input-excluir-produto-id').value = id;
-            document.getElementById('modal-excluir-produto').style.display = 'flex';
-        }
-
-        // --- Lógica de Comentários ---
-        function abrirModalComentarios(id, nome) {
-            produtoAtualId = id;
-            produtoAtualNome = nome;
-
-            document.getElementById('modal-produto-nome').textContent = nome + ' / Observações do produto';
-            const commentList = document.getElementById('lista-comentarios-container');
-
-            commentList.innerHTML = '<p style="color: #A8A8B3; text-align: center; padding: 20px;">Carregando...</p>';
-            document.getElementById('modal-lista-comentarios').style.display = 'flex';
-
-            fetch(`buscar-comentarios.php?produto_id=${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    commentList.innerHTML = '';
-
-                    if (data.length === 0) {
-                        commentList.innerHTML = '<p style="color: #A8A8B3; text-align: center; padding: 20px;">Nenhum comentário registrado ainda.</p>';
-                        return;
-                    }
-
-                    data.forEach(com => {
-                        const iniciais = com.nome.substring(0, 2).toUpperCase();
-                        const dataComentario = new Date(com.criado_em);
-                        const formatada = dataComentario.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' + dataComentario.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-                        // Botão de excluir comentário (aparece só se tiver permissão)
-                        let btnExcluir = '';
-                        if (com.pode_excluir) {
-                            btnExcluir = `<button onclick="excluirComentario(${com.id})" style="background:none; border:none; color: #EF4444; font-size: 0.75rem; cursor: pointer; margin-top: 8px;">Deletar comentário</button>`;
-                        }
-
-                        commentList.innerHTML += `
-                            <div class="comment-card">
-                                <div class="avatar" style="color: ${com.nivel_acesso === 'admin' ? '#9D7AFF' : '#FFF'};">${iniciais}</div>
-                                <div class="comment-body">
-                                    <h4>${com.nome} <span style="color: #A8A8B3; font-weight: normal;">- ${com.nivel_acesso.charAt(0).toUpperCase() + com.nivel_acesso.slice(1)}</span></h4>
-                                    <span style="font-size: 0.75rem; color: #52525B;">${formatada}</span>
-                                    <p style="margin-top: 8px; font-size: 0.875rem; line-height: 1.4; color: #E1E1E6;">${com.comentario}</p>
-                                    ${btnExcluir}
-                                </div>
-                            </div>
-                        `;
-                    });
-                });
-        }
-
-        function abrirModalAddComentario() {
-            fecharModal('modal-lista-comentarios'); // Fecha a lista
-
-            document.getElementById('modal-add-produto-nome').textContent = produtoAtualNome + ' / Observações do produto';
-            document.getElementById('input-add-produto-id').value = produtoAtualId;
-            document.getElementById('modal-add-comentario').style.display = 'flex';
-        }
-
-        function excluirComentario(idComentario) {
-            if (confirm('Tem certeza que deseja excluir este comentário?')) {
-                fetch(`excluir-comentario.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `id=${idComentario}`
-                }).then(() => {
-                    // Recarrega a lista de comentários para o produto atual
-                    abrirModalComentarios(produtoAtualId, produtoAtualNome);
-                });
-            }
-        }
-        // --- Lógica de Movimentação (Entrada/Saída) ---
-        let estoqueAtualMovimentacao = 0;
-
-        function abrirModalMovimentar(id, nome, estoqueAtual) {
-            estoqueAtualMovimentacao = parseInt(estoqueAtual);
-
-            document.getElementById('input-mov-produto-id').value = id;
-            document.getElementById('modal-mov-subtitle').textContent = `${nome} / ${estoqueAtual} unidades disponíveis`;
-            document.getElementById('input-mov-quantidade').value = '';
-            document.getElementById('preview-estoque-final').textContent = `${estoqueAtual} unidades`;
-
-            // Reseta para entrada por padrão
-            setTipoMovimentacao('entrada');
-
-            document.getElementById('modal-movimentar').style.display = 'flex';
-        }
-
-        function setTipoMovimentacao(tipo) {
-            document.getElementById('input-mov-tipo').value = tipo;
-
-            const btnEntrada = document.getElementById('btn-tab-entrada');
-            const btnSaida = document.getElementById('btn-tab-saida');
-            const btnSubmit = document.getElementById('btn-submit-movimentacao');
-
-            if (tipo === 'entrada') {
-                btnEntrada.classList.add('active');
-                btnSaida.classList.remove('active');
-                btnSubmit.textContent = 'Registrar entrada';
-            } else {
-                btnSaida.classList.add('active');
-                btnEntrada.classList.remove('active');
-                btnSubmit.textContent = 'Registrar saída';
-            }
-
-            calcularEstoque(); // Recalcula caso o usuário troque a aba com um número já digitado
-        }
-
-        function calcularEstoque() {
-            const inputQtd = document.getElementById('input-mov-quantidade');
-            const tipo = document.getElementById('input-mov-tipo').value;
-            const preview = document.getElementById('preview-estoque-final');
-
-            let qtd = parseInt(inputQtd.value);
-            if (isNaN(qtd)) qtd = 0;
-
-            let estoqueFinal = estoqueAtualMovimentacao;
-
-            if (tipo === 'entrada') {
-                estoqueFinal += qtd;
-            } else {
-                estoqueFinal -= qtd;
-                if (estoqueFinal < 0) estoqueFinal = 0; // Evita mostrar negativo no preview
-            }
-
-            preview.textContent = `${estoqueFinal} unidades`;
-        }
-    </script>
+    <script src="main.js"></script>
 
 </body>
 
