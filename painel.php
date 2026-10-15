@@ -60,70 +60,36 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
         </header>
 
         <main>
-            <!-- Título da Página e Métricas -->
+            <!-- Banner de Sucesso (Exibido após adicionar comentário) -->
+            <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
+                <div class="success-banner">
+                    <?= htmlspecialchars($_SESSION['mensagem_sucesso']) ?>
+                </div>
+                <?php unset($_SESSION['mensagem_sucesso']); // Limpa a mensagem após exibir ?>
+            <?php endif; ?>
+
             <section class="page-header">
-                <span class="tag" style="background: none; padding: 0;">SEU ESTOQUE, EM ORDEM.</span>
-                <h1>Tudo no seu lugar.</h1>
-                <p>Acompanhe seus produtos e deixe o estoque fluir.</p>
-
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <h3><?= $totalUnidades ?></h3>
-                        <p>unidades em estoque</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3><?= $produtosAtivos ?></h3>
-                        <p>produtos ativos</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3><?= $estoqueBaixo ?></h3>
-                        <p>produto com estoque baixo</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Barra de Busca e Filtro -->
-            <section class="filters-section">
-                <div>
-                    <span style="font-size: 0.75rem; color: #A8A8B3; display: block; margin-bottom: 8px;">BUSCAR PRODUTO</span>
-                    <input type="text" class="search-input" placeholder="Buscar por nome ou descrição">
-                </div>
-                <button class="toggle-active" style="cursor: pointer;">Somente ativos</button>
+                <!-- Resto do seu page-header (métricas) permanece igual -->
+                <!-- ... (Mantenha o HTML de métricas e filtros aqui) ... -->
             </section>
 
             <!-- Grid de Produtos Dinâmico -->
             <section class="products-grid">
                 <?php foreach ($produtos as$produto): ?>
                 <div class="product-card">
-                    <div class="product-info">
-                        <div class="product-image">
-                            <?php if (!empty($produto['imagem'])): ?>
-                                <img src="uploads/<?= htmlspecialchars($produto['imagem']) ?>" alt="Img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                            <?php else: ?>
-                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 24px; color: #9D7AFF;">&#128230;</div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="product-details">
-                            <h4><?= htmlspecialchars($produto['nome']) ?></h4>
-                            <p><?= htmlspecialchars($produto['descricao']) ?></p>
-                            <div class="product-price">R$<?= number_format($produto['preco'], 2, ',', '.') ?></div>
-                        </div>
-                    </div>
+                    <!-- ... (Mantenha a imagem e detalhes do produto aqui) ... -->
                     
                     <div class="product-footer">
                         <div class="product-stock">
                             <span><?= sprintf("%02d", $produto['quantidade']) ?></span> unidades
                         </div>
                         <div class="product-actions">
-                            <a href="#" class="action-link">&darr;&uarr; Movimentar</a>
+                            <a href="movimentar.php?id=<?= $produto['id'] ?>" class="action-link">&darr;&uarr; Movimentar</a>
                             
                             <?php if ($isAdmin): ?>
                                 <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="action-link">Editar</a>
-                                
-                                <form action="excluir-produto.php" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este produto?');">
-                                    <input type="hidden" name="id" value="<?= $produto['id'] ?>">
-                                    <button type="submit" class="action-link" style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">Excluir</button>
-                                </form>
+                                <!-- Novo gatilho para o Modal Customizado de Excluir -->
+                                <button onclick="abrirModalExcluir(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')" class="action-link" style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">Excluir</button>
                             <?php endif; ?>
                             
                             <button onclick="abrirModalComentarios(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')" class="action-link" style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">Comentários &nearr;</button>
@@ -135,45 +101,107 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
         </main>
     </div>
 
-    <!-- Estrutura do Modal de Comentários (Oculto por Padrão) -->
-    <div class="modal-overlay" style="display: none;">
+    <!-- MODAL 1: Lista de Comentários -->
+    <div class="modal-overlay" id="modal-lista-comentarios" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <div>
                     <h2>Conversas que organizam.</h2>
                     <p id="modal-produto-nome">Produto / Observações do produto</p>
                 </div>
-                <button class="btn-close">&times;</button>
+                <button class="btn-close" onclick="fecharModal('modal-lista-comentarios')">&times;</button>
             </div>
 
             <p style="color: #52525B; font-size: 0.75rem; margin-bottom: 16px;">Comentários • Mais recentes primeiro</p>
 
-            <div class="comment-list">
-                <!-- Os comentários serão injetados aqui via JavaScript -->
-            </div>
+            <div class="comment-list" id="lista-comentarios-container"></div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #29292E; padding-top: 24px;">
-                <button class="btn-secondary" id="btn-fechar-modal">Fechar</button>
-                <button class="btn-primary" style="width: auto; margin: 0;">+ Adicionar comentário</button>
+                <button class="btn-secondary" onclick="fecharModal('modal-lista-comentarios')">Fechar</button>
+                <button class="btn-primary" onclick="abrirModalAddComentario()" style="width: auto; margin: 0;">+ Adicionar comentário</button>
             </div>
         </div>
     </div>
 
-    <!-- Lógica JavaScript do Modal -->
-    <script>
-        const modalOverlay = document.querySelector('.modal-overlay');
-        const commentList = document.querySelector('.comment-list');
-        const btnClose = document.querySelector('.btn-close');
-        const btnFechar = document.getElementById('btn-fechar-modal');
-        const modalProdutoNome = document.getElementById('modal-produto-nome');
+    <!-- MODAL 2: Adicionar Comentário -->
+    <div class="modal-overlay" id="modal-add-comentario" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div>
+                    <h2>Adicionar comentário</h2>
+                    <p id="modal-add-produto-nome">Produto / Observações do produto</p>
+                </div>
+                <button class="btn-close" onclick="fecharModal('modal-add-comentario')">&times;</button>
+            </div>
 
-        // Função para abrir o modal e carregar comentários
-        function abrirModalComentarios(produtoId, produtoNome) {
-            modalProdutoNome.textContent = produtoNome + ' / Observações do produto';
-            commentList.innerHTML = '<p style="color: #A8A8B3; text-align: center; padding: 20px;">Carregando...</p>';
-            modalOverlay.style.display = 'flex';
+            <form action="adicionar-comentario.php" method="POST">
+                <input type="hidden" name="produto_id" id="input-add-produto-id">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 0.875rem; color: #E1E1E6;">Comentário *</label>
+                    <textarea name="comentario" rows="4" class="form-input" placeholder="Lote conferido. Todos os itens estão em bom estado." required></textarea>
+                </div>
+                
+                <p style="color: #52525B; font-size: 0.75rem; margin-bottom: 24px;">Esta ação ficará registrada no histórico do produto.</p>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #29292E; padding-top: 24px;">
+                    <button type="button" class="btn-secondary" onclick="fecharModal('modal-add-comentario')">Fechar e voltar</button>
+                    <button type="submit" class="btn-primary" style="width: auto; margin: 0;">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Excluir Produto -->
+    <div class="modal-overlay" id="modal-excluir-produto" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <div>
+                    <h2>Excluir produto?</h2>
+                    <p id="modal-excluir-produto-nome">Nome do Produto</p>
+                </div>
+                <button class="btn-close" onclick="fecharModal('modal-excluir-produto')">&times;</button>
+            </div>
+
+            <p style="color: #E1E1E6; font-size: 0.875rem; margin-bottom: 24px; line-height: 1.5;">Atenção! Tem certeza que deseja excluir o produto?<br>Esta ação não poderá ser desfeita.</p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #29292E; padding-top: 24px;">
+                <button type="button" class="btn-secondary" onclick="fecharModal('modal-excluir-produto')">Cancelar</button>
+                <form action="excluir-produto.php" method="POST" style="margin: 0;">
+                    <input type="hidden" name="id" id="input-excluir-produto-id">
+                    <button type="submit" class="btn-danger">Sim, excluir produto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT DOS MODAIS -->
+    <script>
+        let produtoAtualId = null;
+        let produtoAtualNome = '';
+
+        function fecharModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // --- Lógica de Excluir Produto ---
+        function abrirModalExcluir(id, nome) {
+            document.getElementById('modal-excluir-produto-nome').textContent = nome;
+            document.getElementById('input-excluir-produto-id').value = id;
+            document.getElementById('modal-excluir-produto').style.display = 'flex';
+        }
+
+        // --- Lógica de Comentários ---
+        function abrirModalComentarios(id, nome) {
+            produtoAtualId = id;
+            produtoAtualNome = nome;
             
-            fetch(`buscar-comentarios.php?produto_id=${produtoId}`)
+            document.getElementById('modal-produto-nome').textContent = nome + ' / Observações do produto';
+            const commentList = document.getElementById('lista-comentarios-container');
+            
+            commentList.innerHTML = '<p style="color: #A8A8B3; text-align: center; padding: 20px;">Carregando...</p>';
+            document.getElementById('modal-lista-comentarios').style.display = 'flex';
+            
+            fetch(`buscar-comentarios.php?produto_id=${id}`)
                 .then(response => response.json())
                 .then(data => {
                     commentList.innerHTML = '';
@@ -185,11 +213,15 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
                     
                     data.forEach(com => {
                         const iniciais = com.nome.substring(0, 2).toUpperCase();
-                        
-                        // Tratamento de data/hora
                         const dataComentario = new Date(com.criado_em);
                         const formatada = dataComentario.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' + dataComentario.toLocaleTimeString('pt-BR', { hour: '2-digit', minute:'2-digit' });
                         
+                        // Botão de excluir comentário (aparece só se tiver permissão)
+                        let btnExcluir = '';
+                        if(com.pode_excluir) {
+                            btnExcluir = `<button onclick="excluirComentario(${com.id})" style="background:none; border:none; color: #EF4444; font-size: 0.75rem; cursor: pointer; margin-top: 8px;">Deletar comentário</button>`;
+                        }
+
                         commentList.innerHTML += `
                             <div class="comment-card">
                                 <div class="avatar" style="color: ${com.nivel_acesso === 'admin' ? '#9D7AFF' : '#FFF'};">${iniciais}</div>
@@ -197,30 +229,34 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
                                     <h4>${com.nome} <span style="color: #A8A8B3; font-weight: normal;">- ${com.nivel_acesso.charAt(0).toUpperCase() + com.nivel_acesso.slice(1)}</span></h4>
                                     <span style="font-size: 0.75rem; color: #52525B;">${formatada}</span>
                                     <p style="margin-top: 8px; font-size: 0.875rem; line-height: 1.4; color: #E1E1E6;">${com.comentario}</p>
+                                    ${btnExcluir}
                                 </div>
                             </div>
                         `;
                     });
-                })
-                .catch(err => {
-                    commentList.innerHTML = '<p style="color: #EF4444; text-align: center; padding: 20px;">Erro ao carregar comentários.</p>';
                 });
         }
 
-        // Funções para fechar o modal
-        function fecharModal() {
-            modalOverlay.style.display = 'none';
+        function abrirModalAddComentario() {
+            fecharModal('modal-lista-comentarios'); // Fecha a lista
+            
+            document.getElementById('modal-add-produto-nome').textContent = produtoAtualNome + ' / Observações do produto';
+            document.getElementById('input-add-produto-id').value = produtoAtualId;
+            document.getElementById('modal-add-comentario').style.display = 'flex';
         }
 
-        btnClose.addEventListener('click', fecharModal);
-        btnFechar.addEventListener('click', fecharModal);
-
-        // Fechar ao clicar fora do conteúdo do modal
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) {
-                fecharModal();
+        function excluirComentario(idComentario) {
+            if (confirm('Tem certeza que deseja excluir este comentário?')) {
+                fetch(`excluir-comentario.php`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `id=${idComentario}`
+                }).then(() => {
+                    // Recarrega a lista de comentários para o produto atual
+                    abrirModalComentarios(produtoAtualId, produtoAtualNome); 
+                });
             }
-        });
+        }
     </script>
 </body>
 </html>

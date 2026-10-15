@@ -505,3 +505,51 @@ body {
 .comment-body h4 { font-size: 0.875rem; margin-bottom: 4px; }
 .comment-body span { color: #A8A8B3; font-size: 0.75rem; font-weight: normal; }
 .comment-body p { margin-top: 8px; font-size: 0.875rem; line-height: 1.4; }
+
+/* Banner de Sucesso */
+.success-banner {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10B981;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+/* Botão de Perigo (Excluir) */
+.btn-danger {
+    background-color: #9F1239;
+    color: #FFF;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #E11D48;
+}
+
+/* Textarea para Comentários */
+textarea.form-input {
+    width: 100%;
+    padding: 16px;
+    background-color: #121214;
+    border: 1px solid #29292E;
+    border-radius: 8px;
+    color: #FFF;
+    font-family: inherit;
+    font-size: 0.875rem;
+    resize: none;
+    outline: none;
+}
+textarea.form-input:focus {
+    border-color: #9D7AFF;
+}
