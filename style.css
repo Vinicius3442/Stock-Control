@@ -553,3 +553,114 @@ textarea.form-input {
 textarea.form-input:focus {
     border-color: #9D7AFF;
 }
+/* Abas de Movimentação */
+.tabs-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #29292E;
+    background-color: #121214;
+    color: #A8A8B3;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background-color: #7C3AED;
+    color: #FFF;
+    border-color: #7C3AED;
+}
+
+/* Caixa de Pré-visualização de Estoque */
+.stock-preview {
+    background-color: rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.stock-preview span {
+    display: block;
+    color: #9D7AFF;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.stock-preview strong {
+    font-size: 1.25rem;
+    color: #FFF;
+}
+/* Tabela de Histórico */
+.history-section {
+    background-color: #181820;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 40px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.history-table th {
+    color: #A8A8B3;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #29292E;
+}
+
+.history-table td {
+    padding: 24px 0;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #29292E;
+    color: #E1E1E6;
+}
+
+.history-table tr:last-child td {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Filtro e Ações do Histórico */
+.history-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 0.75rem;
+    color: #A8A8B3;
+    text-transform: uppercase;
+}
+
+.select-filter {
+    background-color: #121214;
+    border: 1px solid #29292E;
+    color: #FFF;
+    padding: 12px 16px;
+    border-radius: 8px;
+    width: 300px;
+    outline: none;
+    appearance: none; /* Remove seta padrão em alguns browsers */
+}

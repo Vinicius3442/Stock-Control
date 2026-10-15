@@ -69,15 +69,13 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
             <?php endif; ?>
 
             <section class="page-header">
-                <!-- Resto do seu page-header (métricas) permanece igual -->
-                <!-- ... (Mantenha o HTML de métricas e filtros aqui) ... -->
+
             </section>
 
             <!-- Grid de Produtos Dinâmico -->
             <section class="products-grid">
                 <?php foreach ($produtos as$produto): ?>
                 <div class="product-card">
-                    <!-- ... (Mantenha a imagem e detalhes do produto aqui) ... -->
                     
                     <div class="product-footer">
                         <div class="product-stock">
@@ -173,6 +171,52 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
             </div>
         </div>
     </div>
+    <!-- MODAL 4: Movimentar Estoque -->
+    <div class="modal-overlay" id="modal-movimentar" style="display: none;">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div>
+                    <h2>Cada movimento conta.</h2>
+                    <p id="modal-mov-subtitle">Produto / 0 unidades disponíveis</p>
+                </div>
+                <button class="btn-close" onclick="fecharModal('modal-movimentar')">&times;</button>
+            </div>
+
+            <form action="registrar-movimentacao.php" method="POST">
+                <input type="hidden" name="produto_id" id="input-mov-produto-id">
+                <input type="hidden" name="tipo_movimento" id="input-mov-tipo" value="entrada">
+
+                <!-- Abas -->
+                <div class="tabs-container">
+                    <button type="button" class="tab-btn active" id="btn-tab-entrada" onclick="setTipoMovimentacao('entrada')">&plus; Entrada</button>
+                    <button type="button" class="tab-btn" id="btn-tab-saida" onclick="setTipoMovimentacao('saida')">&uarr; Saída</button>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 0.875rem; color: #E1E1E6;">Quantidade *</label>
+                    <input type="number" name="quantidade" id="input-mov-quantidade" class="form-input" style="width: 100%; padding: 16px; background-color: #121214; border: 1px solid #29292E; border-radius: 8px; color: #FFF;" required min="1" oninput="calcularEstoque()">
+                </div>
+
+                <!-- Preview Dinâmico -->
+                <div class="stock-preview">
+                    <span>ESTOQUE APÓS A MOVIMENTAÇÃO</span>
+                    <strong id="preview-estoque-final">0 unidades</strong>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 0.875rem; color: #E1E1E6;">Observação (opcional)</label>
+                    <input type="text" name="observacao" class="form-input" style="width: 100%; padding: 16px; background-color: #121214; border: 1px solid #29292E; border-radius: 8px; color: #FFF;" placeholder="Ex: Recebimento de novo lote.">
+                </div>
+
+                <p style="color: #52525B; font-size: 0.75rem; margin-bottom: 24px;">Responsável: <?= htmlspecialchars($_SESSION['nome']) ?> | Data e hora automáticas.</p>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #29292E; padding-top: 24px;">
+                    <button type="button" class="btn-secondary" onclick="fecharModal('modal-movimentar')">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btn-submit-movimentacao" style="width: auto; margin: 0;">Registrar entrada</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- LÓGICA JAVASCRIPT DOS MODAIS -->
     <script>
@@ -257,6 +301,63 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
                 });
             }
         }
+        // --- Lógica de Movimentação (Entrada/Saída) ---
+        let estoqueAtualMovimentacao = 0;
+
+        function abrirModalMovimentar(id, nome, estoqueAtual) {
+            estoqueAtualMovimentacao = parseInt(estoqueAtual);
+            
+            document.getElementById('input-mov-produto-id').value = id;
+            document.getElementById('modal-mov-subtitle').textContent = `${nome} / ${estoqueAtual} unidades disponíveis`;
+            document.getElementById('input-mov-quantidade').value = '';
+            document.getElementById('preview-estoque-final').textContent = `${estoqueAtual} unidades`;
+            
+            // Reseta para entrada por padrão
+            setTipoMovimentacao('entrada');
+            
+            document.getElementById('modal-movimentar').style.display = 'flex';
+        }
+
+        function setTipoMovimentacao(tipo) {
+            document.getElementById('input-mov-tipo').value = tipo;
+            
+            const btnEntrada = document.getElementById('btn-tab-entrada');
+            const btnSaida = document.getElementById('btn-tab-saida');
+            const btnSubmit = document.getElementById('btn-submit-movimentacao');
+            
+            if (tipo === 'entrada') {
+                btnEntrada.classList.add('active');
+                btnSaida.classList.remove('active');
+                btnSubmit.textContent = 'Registrar entrada';
+            } else {
+                btnSaida.classList.add('active');
+                btnEntrada.classList.remove('active');
+                btnSubmit.textContent = 'Registrar saída';
+            }
+            
+            calcularEstoque(); // Recalcula caso o usuário troque a aba com um número já digitado
+        }
+
+        function calcularEstoque() {
+            const inputQtd = document.getElementById('input-mov-quantidade');
+            const tipo = document.getElementById('input-mov-tipo').value;
+            const preview = document.getElementById('preview-estoque-final');
+            
+            let qtd = parseInt(inputQtd.value);
+            if (isNaN(qtd)) qtd = 0;
+            
+            let estoqueFinal = estoqueAtualMovimentacao;
+            
+            if (tipo === 'entrada') {
+                estoqueFinal += qtd;
+            } else {
+                estoqueFinal -= qtd;
+                if (estoqueFinal < 0) estoqueFinal = 0; // Evita mostrar negativo no preview
+            }
+            
+            preview.textContent = `${estoqueFinal} unidades`;
+        }
     </script>
+    
 </body>
 </html>
