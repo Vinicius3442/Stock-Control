@@ -172,36 +172,40 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
                             </div>
                         </div>
 
-                        <!-- Footer com os botões (O SEU JÁ ESTAVA CERTO) -->
+                        <!-- Novo Rodapé do Cartão (Hover Effect) -->
                         <div class="product-footer">
                             <div class="product-stock">
                                 <span><?= sprintf("%02d", $produto['quantidade']) ?></span> unidades
                             </div>
-                            <div class="product-actions">
+
+                            <!-- Botões visíveis por padrão (As ações principais) -->
+                            <div style="display: flex; gap: 8px;">
                                 <a href="#"
                                     onclick="abrirModalMovimentar(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>', <?= $produto['quantidade'] ?>)"
-                                    class="action-link" style="text-decoration:none;">
-                                    <i class="ph ph-arrows-down-up"></i> Movimentar
+                                    class="btn-pill-action">
+                                    <i class="ph ph-arrows-down-up" style="font-size: 1rem;"></i> Movimentar
                                 </a>
+                            </div>
 
-                                <?php if ($isAdmin): ?>
-                                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="action-link">
-                                        <i class="ph ph-pencil-simple"></i> Editar
+                            <!-- Menu de opções extra (Desliza da direita ao fazer Hover) -->
+                            <div class="product-actions-hover">
+                                <button
+                                    onclick="abrirModalComentarios(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
+                                    class="btn-icon-action" title="Comentários">
+                                    <i class="ph ph-chat-text"></i>
+                                </button>
+
+                                <?php if (isset($isAdmin) && $isAdmin): ?>
+                                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="btn-icon-action"
+                                        title="Editar">
+                                        <i class="ph ph-pencil-simple"></i>
                                     </a>
                                     <button
                                         onclick="abrirModalExcluir(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
-                                        class="action-link"
-                                        style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">
-                                        <i class="ph ph-trash"></i> Excluir
+                                        class="btn-icon-action delete" title="Excluir">
+                                        <i class="ph ph-trash"></i>
                                     </button>
                                 <?php endif; ?>
-
-                                <button
-                                    onclick="abrirModalComentarios(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
-                                    class="action-link"
-                                    style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">
-                                    <i class="ph ph-chat-text"></i> Comentários
-                                </button>
                             </div>
                         </div>
                     </div>

@@ -1213,3 +1213,105 @@ a.btn-primary:hover {
     transform: translateY(-5px);
     color: #9D7AFF;
 }
+/* --- Redesign do Rodapé do Cartão de Produto --- */
+.product-footer {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #29292E;
+    padding-top: 16px;
+    margin-top: auto;
+    overflow: hidden; /* Importante para a animação */
+}
+
+/* Oculta as ações primárias inicialmente */
+.product-actions-hover {
+    position: absolute;
+    right: 0;
+    bottom: 16px;
+    display: flex;
+    gap: 8px;
+    background-color: #181820; /* Fundo igual ao cartão para sobrepor o texto do stock */
+    padding-left: 12px;
+    transform: translateX(110%); /* Esconde à direita */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mostra as ações ao passar o rato no cartão */
+.product-card:hover .product-actions-hover {
+    transform: translateX(0);
+}
+
+/* Estilo para os novos botões de ícone (Ações secundárias: Editar/Excluir) */
+.btn-icon-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: #121214;
+    border: 1px solid #29292E;
+    color: #A8A8B3;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-icon-action:hover {
+    color: #FFF;
+    border-color: #9D7AFF;
+    background-color: rgba(157, 122, 255, 0.1);
+}
+
+.btn-icon-action.delete:hover {
+    border-color: #EF4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+}
+
+/* Botão principal (Movimentar e Comentários) */
+.btn-pill-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background-color: rgba(157, 122, 255, 0.1);
+    color: #9D7AFF;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.btn-pill-action:hover {
+    background-color: #9D7AFF;
+    color: #FFF;
+    box-shadow: 0 4px 12px rgba(157, 122, 255, 0.3);
+}
+
+.btn-pill-action.comment {
+    background-color: #29292E;
+    color: #E1E1E6;
+}
+
+.btn-pill-action.comment:hover {
+    background-color: #3F3F46;
+    color: #FFF;
+}
+/* Garante que o ícone de fallback fique centrado e bonito */
+.product-image {
+    width: 72px; /* Ligeiramente maior */
+    height: 72px; /* Ligeiramente maior */
+    background-color: #29292E;
+    border-radius: 12px;
+    flex-shrink: 0; /* Impede a imagem de amassar */
+    overflow: hidden;
+}
+
+/* Oculta os links feios antigos se tiver sobrado algum */
+.product-footer .action-link {
+    display: none; 
+}
