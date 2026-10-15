@@ -59,8 +59,8 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
             </div>
         </header>
 
-        <main>
-            <!-- Banner de Sucesso (Exibido após adicionar comentário) -->
+       <main>
+            <!-- Banner de Sucesso (Exibido após adicionar comentário/movimentação) -->
             <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
                 <div class="success-banner">
                     <?= htmlspecialchars($_SESSION['mensagem_sucesso']) ?>
@@ -68,25 +68,69 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
                 <?php unset($_SESSION['mensagem_sucesso']); // Limpa a mensagem após exibir ?>
             <?php endif; ?>
 
+            <!-- Cabeçalho com Métricas (ESTAVA FALTANDO) -->
             <section class="page-header">
+                <span class="tag" style="background: none; padding: 0;">SEU ESTOQUE, EM ORDEM.</span>
+                <h1>Tudo no seu lugar.</h1>
+                <p>Acompanhe seus produtos e deixe o estoque fluir.</p>
 
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3><?= $totalUnidades ?></h3>
+                        <p>unidades em estoque</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3><?= $produtosAtivos ?></h3>
+                        <p>produtos ativos</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3><?= $estoqueBaixo ?></h3>
+                        <p>produto com estoque baixo</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Barra de Busca e Filtro (ESTAVA FALTANDO) -->
+            <section class="filters-section">
+                <div>
+                    <span style="font-size: 0.75rem; color: #A8A8B3; display: block; margin-bottom: 8px;">BUSCAR PRODUTO</span>
+                    <input type="text" class="search-input" placeholder="Buscar por nome ou descrição">
+                </div>
+                <button class="toggle-active" style="cursor: pointer;">Somente ativos</button>
             </section>
 
             <!-- Grid de Produtos Dinâmico -->
             <section class="products-grid">
-                <?php foreach ($produtos as$produto): ?>
+                <?php foreach ($produtos as $produto): ?>
                 <div class="product-card">
                     
+                    <!-- Informações do Produto (ESTAVA FALTANDO) -->
+                    <div class="product-info">
+                        <div class="product-image">
+                            <?php if (!empty($produto['imagem'])): ?>
+                                <img src="uploads/<?= htmlspecialchars($produto['imagem']) ?>" alt="Img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <?php else: ?>
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 24px; color: #9D7AFF;">&#128230;</div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="product-details">
+                            <h4><?= htmlspecialchars($produto['nome']) ?></h4>
+                            <p><?= htmlspecialchars($produto['descricao']) ?></p>
+                            <div class="product-price">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer com os botões (O SEU JÁ ESTAVA CERTO) -->
                     <div class="product-footer">
                         <div class="product-stock">
                             <span><?= sprintf("%02d", $produto['quantidade']) ?></span> unidades
                         </div>
                         <div class="product-actions">
-                            <a href="movimentar.php?id=<?= $produto['id'] ?>" class="action-link">&darr;&uarr; Movimentar</a>
+                            <a href="#" onclick="abrirModalMovimentar(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>', <?= $produto['quantidade'] ?>)" class="action-link" style="text-decoration:none;">&darr;&uarr; Movimentar</a>
                             
                             <?php if ($isAdmin): ?>
                                 <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="action-link">Editar</a>
-                                <!-- Novo gatilho para o Modal Customizado de Excluir -->
+                                <!-- Gatilho para o Modal Customizado de Excluir -->
                                 <button onclick="abrirModalExcluir(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')" class="action-link" style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">Excluir</button>
                             <?php endif; ?>
                             
