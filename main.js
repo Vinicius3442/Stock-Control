@@ -230,3 +230,54 @@ function calcularEstoque() {
     }
     preview.textContent = `${estoqueFinal} unidades`;
 }
+// --- Lógica de Pesquisa da Tabela de Movimentações ---
+const movInput = document.getElementById('mov-input-pesquisa');
+const movIconLupa = document.getElementById('mov-icon-lupa');
+const movIconSpinner = document.getElementById('mov-icon-spinner');
+const movEmptyState = document.getElementById('mov-empty-state');
+const movErrorIcon = document.getElementById('mov-error-icon');
+let movTimer;
+
+if (movInput) {
+    movInput.addEventListener('input', () => {
+        movIconLupa.style.display = 'none';
+        movIconSpinner.style.display = 'block';
+        clearTimeout(movTimer);
+
+        movTimer = setTimeout(() => {
+            movIconSpinner.style.display = 'none';
+            movIconLupa.style.display = 'block';
+
+            const termo = movInput.value.toLowerCase();
+            const linhas = document.querySelectorAll('.history-row');
+            let visiveis = 0;
+
+            linhas.forEach(linha => {
+                // Junta todo o texto da linha (produto, responsável, tipo, etc)
+                const textoLinha = linha.textContent.toLowerCase();
+                
+                if (textoLinha.includes(termo)) {
+                    visiveis++;
+                    linha.style.display = 'table-row';
+                    linha.style.opacity = '1';
+                } else {
+                    linha.style.opacity = '0';
+                    setTimeout(() => { if (linha.style.opacity === '0') linha.style.display = 'none'; }, 200);
+                }
+            });
+
+            // Lógica do Erro Animado
+            if (visiveis === 0) {
+                setTimeout(() => { 
+                    movEmptyState.style.display = 'block'; 
+                    // Remove e adiciona a classe para forçar a animação de tremer sempre que falhar
+                    movErrorIcon.classList.remove('shake-animation');
+                    void movErrorIcon.offsetWidth; // Truque para reiniciar animação
+                    movErrorIcon.classList.add('shake-animation');
+                }, 200);
+            } else {
+                movEmptyState.style.display = 'none';
+            }
+        }, 500);
+    });
+}

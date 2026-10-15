@@ -1158,3 +1158,58 @@ a.btn-primary:hover {
   color: #a8a8b3;
   font-size: 0.875rem;
 }
+/* --- Correção do Layout das Movimentações (Botões Gigantes) --- */
+.history-actions {
+    display: flex;
+    align-items: flex-end; /* Alinha pela base */
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.history-actions .filter-group {
+    flex: 1;
+    max-width: 400px; /* Impede o campo de esticar até ao infinito */
+    margin: 0;
+}
+
+.history-actions .btn-primary {
+    width: auto !important; /* Corta o efeito gigante */
+    padding: 12px 24px;
+    height: 48px; /* Mesma altura do campo de busca */
+}
+
+/* --- Animação Dinâmica de Erro (Shake) --- */
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px) rotate(-5deg); color: #EF4444; }
+    40%, 80% { transform: translateX(8px) rotate(5deg); color: #EF4444; }
+}
+
+.shake-animation {
+    animation: errorShake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* --- Hover Dinâmico no Upload de Imagem --- */
+.image-upload-box {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.image-upload-box:hover {
+    border-color: #9D7AFF;
+    background-color: rgba(157, 122, 255, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(157, 122, 255, 0.1);
+}
+
+.image-upload-box i {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.image-upload-box:hover i {
+    transform: translateY(-5px);
+    color: #9D7AFF;
+}

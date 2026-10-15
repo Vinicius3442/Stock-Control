@@ -45,23 +45,28 @@ $total_movimentacoes = count($movimentacoes);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>StockControl - Histórico de Movimentações</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Header Principal Padronizado -->
         <header class="topbar">
             <div class="topbar-left">
-                <div class="logo" style="display: flex; align-items: center; gap: 12px; transition: transform 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <div class="logo"
+                    style="display: flex; align-items: center; gap: 12px; transition: transform 0.3s ease; cursor: pointer;"
+                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="40 35 120 135" style="width: 28px;">
                         <polygon points="100,100 100,164 45,132 45,68" fill="#6D28D9" />
                         <polygon points="100,100 155,68 155,132 100,164" fill="#8B5CF6" />
                         <polygon points="100,36 155,68 100,100 45,68" fill="#A78BFA" />
-                        <polyline points="80,47 135,79.5 135,120" stroke="#F5F3FF" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+                        <polyline points="80,47 135,79.5 135,120" stroke="#F5F3FF" stroke-width="4" fill="none"
+                            stroke-linejoin="round" stroke-linecap="round" />
                     </svg>
                     <strong style="font-size: 1.25rem;">StockControl</strong>
                 </div>
@@ -73,10 +78,12 @@ $total_movimentacoes = count($movimentacoes);
 
             <div class="topbar-right">
                 <a href="perfil.php" style="text-decoration: none;">
-                    <div class="user-profile" style="transition: transform 0.2s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="user-profile" style="transition: transform 0.2s ease; cursor: pointer;"
+                        onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         <div class="avatar">
                             <?php if (!empty($foto_perfil)): ?>
-                                <img src="uploads/<?= htmlspecialchars($foto_perfil) ?>" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                <img src="uploads/<?= htmlspecialchars($foto_perfil) ?>"
+                                    style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                             <?php else: ?>
                                 <?= $iniciais ?>
                             <?php endif; ?>
@@ -99,19 +106,30 @@ $total_movimentacoes = count($movimentacoes);
             </section>
 
             <div class="history-actions">
-                <form action="" method="GET" class="filter-group">
-                    <label for="produto_id">Filtrar Histórico</label>
-                    <select name="produto_id" id="produto_id" class="select-filter" onchange="this.form.submit()">
-                        <option value="">Todos os produtos</option>
-                        <?php foreach ($produtos_lista as $prod): ?>
-                            <option value="<?= $prod['id'] ?>" <?= $filtro_produto_id === $prod['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($prod['nome']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
+                <!-- Nova Barra de Pesquisa -->
+                <div class="filter-group">
+                    <label>Buscar Histórico</label>
+                    <div class="search-container" style="width: 100%; margin-top: 8px;">
+                        <i class="ph ph-magnifying-glass search-icon" id="mov-icon-lupa"></i>
+                        <i class="ph ph-spinner-gap search-icon loading-spinner" id="mov-icon-spinner"
+                            style="display: none;"></i>
+                        <input type="text" id="mov-input-pesquisa" class="search-input"
+                            placeholder="Buscar por produto, tipo ou responsável...">
+                    </div>
+                </div>
 
-                <a href="painel.php" class="btn-primary" style="text-decoration: none; padding: 12px 24px; font-weight: 500;"><i class="ph ph-plus"></i> Nova movimentação</a>
+                <a href="painel.php" class="btn-primary"
+                    style="text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    <i class="ph ph-plus"></i> Nova movimentação
+                </a>
+            </div>
+
+            <!-- Estado de Erro Animado (Fica dentro da history-section, abaixo da tabela) -->
+            <div id="mov-empty-state" style="display: none; text-align: center; padding: 60px 0;">
+                <i class="ph ph-file-dashed" id="mov-error-icon"
+                    style="font-size: 4rem; color: #52525B; margin-bottom: 16px; display: inline-block;"></i>
+                <h3 style="color: #E1E1E6; margin-bottom: 8px;">Nenhuma movimentação encontrada</h3>
+                <p style="color: #A8A8B3; font-size: 0.875rem;">Sua busca não encontrou resultados na tabela.</p>
             </div>
 
             <div class="history-section">
@@ -135,13 +153,16 @@ $total_movimentacoes = count($movimentacoes);
                                 $badgeClass = $isEntrada ? 'badge-in' : 'badge-out';
                                 $icon = $isEntrada ? 'ph-trend-up' : 'ph-trend-down';
                                 $iniciaisUser = strtoupper(substr($mov['usuario_nome'], 0, 2));
-                            ?>
+                                ?>
                                 <tr class="history-row">
-                                    <td><div class="text-sub"><?= $data_formatada ?></div></td>
+                                    <td>
+                                        <div class="text-sub"><?= $data_formatada ?></div>
+                                    </td>
                                     <td>
                                         <div class="produto-cell">
                                             <div class="icon-box"><i class="ph ph-package"></i></div>
-                                            <strong style="color: #E1E1E6;"><?= htmlspecialchars($mov['produto_nome']) ?></strong>
+                                            <strong
+                                                style="color: #E1E1E6;"><?= htmlspecialchars($mov['produto_nome']) ?></strong>
                                         </div>
                                     </td>
                                     <td>
@@ -149,20 +170,26 @@ $total_movimentacoes = count($movimentacoes);
                                             <i class="ph <?= $icon ?>"></i> <?= ucfirst($mov['tipo']) ?>
                                         </span>
                                     </td>
-                                    <td><strong class="<?= $badgeClass ?>" style="font-size: 1.1rem; background: none; padding:0;"><?= $sinal . $mov['quantidade'] ?></strong></td>
+                                    <td><strong class="<?= $badgeClass ?>"
+                                            style="font-size: 1.1rem; background: none; padding:0;"><?= $sinal . $mov['quantidade'] ?></strong>
+                                    </td>
                                     <td>
                                         <div class="user-cell">
                                             <div class="avatar-mini"><?= $iniciaisUser ?></div>
-                                            <span style="color: #E1E1E6; font-size: 0.875rem;"><?= htmlspecialchars($mov['usuario_nome']) ?></span>
+                                            <span
+                                                style="color: #E1E1E6; font-size: 0.875rem;"><?= htmlspecialchars($mov['usuario_nome']) ?></span>
                                         </div>
                                     </td>
-                                    <td><div class="text-sub"><?= htmlspecialchars($mov['observacao']) ?: '-' ?></div></td>
+                                    <td>
+                                        <div class="text-sub"><?= htmlspecialchars($mov['observacao']) ?: '-' ?></div>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
                                 <td colspan="6" style="text-align: center; padding: 60px 0;">
-                                    <i class="ph ph-files" style="font-size: 3rem; color: #52525B; margin-bottom: 16px; display: block;"></i>
+                                    <i class="ph ph-files"
+                                        style="font-size: 3rem; color: #52525B; margin-bottom: 16px; display: block;"></i>
                                     <span style="color: #A8A8B3;">Nenhuma movimentação registada para este filtro.</span>
                                 </td>
                             </tr>
@@ -176,5 +203,7 @@ $total_movimentacoes = count($movimentacoes);
             </div>
         </main>
     </div>
+    <script src="./main.js"></script>
 </body>
+
 </html>
