@@ -37,12 +37,23 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
 <body>
     <div class="dashboard-container">
         <!-- Header Principal -->
+        <!-- Header Principal Corrigido -->
         <header class="topbar">
             <div class="topbar-left">
-                <div class="logo" style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 24px; height: 24px; background: #9D7AFF; border-radius: 4px;"></div>
+                <!-- Novo Logo em SVG (Miniatura da Caixa) -->
+                <div class="logo"
+                    style="display: flex; align-items: center; gap: 12px; transition: transform 0.3s ease; cursor: pointer;"
+                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="40 35 120 135" style="width: 28px;">
+                        <polygon points="100,100 100,164 45,132 45,68" fill="#6D28D9" />
+                        <polygon points="100,100 155,68 155,132 100,164" fill="#8B5CF6" />
+                        <polygon points="100,36 155,68 100,100 45,68" fill="#A78BFA" />
+                        <polyline points="80,47 135,79.5 135,120" stroke="#F5F3FF" stroke-width="4" fill="none"
+                            stroke-linejoin="round" stroke-linecap="round" />
+                    </svg>
                     <strong style="font-size: 1.25rem;">StockControl</strong>
                 </div>
+
                 <nav class="nav-links">
                     <a href="painel.php" class="active">Produtos</a>
                     <a href="./movimentacoes.php">Movimentações</a>
@@ -76,111 +87,125 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
 
                 <a href="logout.php" class="logout-link"><i class="ph ph-sign-out"></i> Sair</a>
             </div>
-    </div>
-    </header>
+        </header>
 
-    <main>
-        <!-- Banner de Sucesso (Exibido após adicionar comentário/movimentação) -->
-        <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
-            <div class="success-banner">
-                <?= htmlspecialchars($_SESSION['mensagem_sucesso']) ?>
-            </div>
-            <?php unset($_SESSION['mensagem_sucesso']); // Limpa a mensagem após exibir ?>
-        <?php endif; ?>
-
-        <!-- Cabeçalho com Métricas (ESTAVA FALTANDO) -->
-        <section class="page-header">
-            <span class="tag" style="background: none; padding: 0;">SEU ESTOQUE, EM ORDEM.</span>
-            <h1>Tudo no seu lugar.</h1>
-            <p>Acompanhe seus produtos e deixe o estoque fluir.</p>
-
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <h3><?= $totalUnidades ?></h3>
-                    <p>unidades em estoque</p>
+        <main>
+            <!-- Banner de Sucesso (Exibido após adicionar comentário/movimentação) -->
+            <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
+                <div class="success-banner">
+                    <?= htmlspecialchars($_SESSION['mensagem_sucesso']) ?>
                 </div>
-                <div class="metric-card">
-                    <h3><?= $produtosAtivos ?></h3>
-                    <p>produtos ativos</p>
-                </div>
-                <div class="metric-card">
-                    <h3><?= $estoqueBaixo ?></h3>
-                    <p>produto com estoque baixo</p>
-                </div>
-            </div>
-        </section>
+                <?php unset($_SESSION['mensagem_sucesso']); // Limpa a mensagem após exibir ?>
+            <?php endif; ?>
 
-        <!-- Barra de Busca e Filtro (ESTAVA FALTANDO) -->
-        <section class="filters-section">
-            <div>
-                <span style="font-size: 0.75rem; color: #A8A8B3; display: block; margin-bottom: 8px;">BUSCAR
-                    PRODUTO</span>
-                <input type="text" class="search-input" placeholder="Buscar por nome ou descrição">
-            </div>
-            <button class="toggle-active" style="cursor: pointer;">Somente ativos</button>
-        </section>
+            <!-- Cabeçalho com Métricas (ESTAVA FALTANDO) -->
+            <!-- Cabeçalho com Métricas Animadas -->
+            <section class="page-header">
+                <span class="tag" style="background: none; padding: 0;">SEU ESTOQUE, EM ORDEM.</span>
+                <h1>Tudo no seu lugar.</h1>
+                <p>Acompanhe seus produtos e deixe o estoque fluir.</p>
 
-        <!-- Grid de Produtos Dinâmico -->
-        <section class="products-grid">
-            <?php foreach ($produtos as $produto): ?>
-                <div class="product-card">
-
-                    <!-- Informações do Produto (ESTAVA FALTANDO) -->
-                    <div class="product-info">
-                        <div class="product-image">
-                            <?php if (!empty($produto['imagem'])): ?>
-                                <img src="uploads/<?= htmlspecialchars($produto['imagem']) ?>" alt="Img"
-                                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                            <?php else: ?>
-                                <div
-                                    style="display: flex; align-items: center; justify-content: center; height: 100%; color: #9D7AFF;">
-                                    <i class="ph ph-package" style="font-size: 40px;"></i>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="product-details">
-                            <h4><?= htmlspecialchars($produto['nome']) ?></h4>
-                            <p><?= htmlspecialchars($produto['descricao']) ?></p>
-                            <div class="product-price">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
-                        </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <i class="ph ph-boxes"
+                            style="font-size: 2rem; color: #9D7AFF; margin-bottom: 12px; display: block;"></i>
+                        <h3 class="counter" data-target="<?= $totalUnidades ?>">0</h3>
+                        <p>unidades em estoque</p>
                     </div>
+                    <div class="metric-card">
+                        <i class="ph ph-check-circle"
+                            style="font-size: 2rem; color: #10B981; margin-bottom: 12px; display: block;"></i>
+                        <h3 class="counter" data-target="<?= $produtosAtivos ?>">0</h3>
+                        <p>produtos ativos</p>
+                    </div>
+                    <div class="metric-card card-alert">
+                        <i class="ph ph-warning"
+                            style="font-size: 2rem; color: #EF4444; margin-bottom: 12px; display: block;"></i>
+                        <h3 class="counter" data-target="<?= $estoqueBaixo ?>">0</h3>
+                        <p>produto(s) com estoque baixo</p>
+                    </div>
+                </div>
+            </section>
 
-                    <!-- Footer com os botões (O SEU JÁ ESTAVA CERTO) -->
-                    <div class="product-footer">
-                        <div class="product-stock">
-                            <span><?= sprintf("%02d", $produto['quantidade']) ?></span> unidades
+            <!-- Barra de Busca e Filtro (Centralizada e Roxinha) -->
+        <section class="filters-section">
+            <div class="filters-left"></div> 
+            
+            <div class="filters-center">
+                <div class="search-container">
+                    <i class="ph ph-magnifying-glass search-icon" id="icon-lupa"></i>
+                    <i class="ph ph-spinner-gap search-icon loading-spinner" id="icon-spinner" style="display: none;"></i>
+                    <input type="text" id="input-pesquisa" class="search-input" placeholder="Buscar por nome ou descrição...">
+                </div>
+            </div>
+            
+            <div class="filters-right">
+                <button class="toggle-active"><i class="ph ph-funnel"></i> Somente ativos</button>
+            </div>
+        </section>
+            
+
+            <!-- Grid de Produtos Dinâmico -->
+            <section class="products-grid">
+                <?php foreach ($produtos as $produto): ?>
+                    <div class="product-card">
+
+                        <!-- Informações do Produto (ESTAVA FALTANDO) -->
+                        <div class="product-info">
+                            <div class="product-image">
+                                <?php if (!empty($produto['imagem'])): ?>
+                                    <img src="uploads/<?= htmlspecialchars($produto['imagem']) ?>" alt="Img"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                                <?php else: ?>
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: center; height: 100%; color: #9D7AFF;">
+                                        <i class="ph ph-package" style="font-size: 40px;"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="product-details">
+                                <h4><?= htmlspecialchars($produto['nome']) ?></h4>
+                                <p><?= htmlspecialchars($produto['descricao']) ?></p>
+                                <div class="product-price">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></div>
+                            </div>
                         </div>
-                        <div class="product-actions">
-                            <a href="#"
-                                onclick="abrirModalMovimentar(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>', <?= $produto['quantidade'] ?>)"
-                                class="action-link" style="text-decoration:none;">
-                                <i class="ph ph-arrows-down-up"></i> Movimentar
-                            </a>
 
-                            <?php if ($isAdmin): ?>
-                                <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="action-link">
-                                    <i class="ph ph-pencil-simple"></i> Editar
+                        <!-- Footer com os botões (O SEU JÁ ESTAVA CERTO) -->
+                        <div class="product-footer">
+                            <div class="product-stock">
+                                <span><?= sprintf("%02d", $produto['quantidade']) ?></span> unidades
+                            </div>
+                            <div class="product-actions">
+                                <a href="#"
+                                    onclick="abrirModalMovimentar(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>', <?= $produto['quantidade'] ?>)"
+                                    class="action-link" style="text-decoration:none;">
+                                    <i class="ph ph-arrows-down-up"></i> Movimentar
                                 </a>
+
+                                <?php if ($isAdmin): ?>
+                                    <a href="editar-produto.php?id=<?= $produto['id'] ?>" class="action-link">
+                                        <i class="ph ph-pencil-simple"></i> Editar
+                                    </a>
+                                    <button
+                                        onclick="abrirModalExcluir(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
+                                        class="action-link"
+                                        style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">
+                                        <i class="ph ph-trash"></i> Excluir
+                                    </button>
+                                <?php endif; ?>
+
                                 <button
-                                    onclick="abrirModalExcluir(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
+                                    onclick="abrirModalComentarios(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
                                     class="action-link"
                                     style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">
-                                    <i class="ph ph-trash"></i> Excluir
+                                    <i class="ph ph-chat-text"></i> Comentários
                                 </button>
-                            <?php endif; ?>
-
-                            <button
-                                onclick="abrirModalComentarios(<?= $produto['id'] ?>, '<?= htmlspecialchars($produto['nome']) ?>')"
-                                class="action-link"
-                                style="background:none; border:none; cursor:pointer; padding: 0; font-family: inherit;">
-                                <i class="ph ph-chat-text"></i> Comentários
-                            </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        </section>
-    </main>
+                <?php endforeach; ?>
+            </section>
+        </main>
     </div>
 
     <!-- MODAL 1: Lista de Comentários -->
@@ -327,6 +352,100 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
 
     <!-- LÓGICA JAVASCRIPT DOS MODAIS -->
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputPesquisa = document.getElementById('input-pesquisa');
+            const iconLupa = document.getElementById('icon-lupa');
+            const iconSpinner = document.getElementById('icon-spinner');
+            let timerPesquisa;
+
+            if (inputPesquisa) {
+                inputPesquisa.addEventListener('input', () => {
+                    // Esconde a lupa e mostra o spinner a girar
+                    iconLupa.style.display = 'none';
+                    iconSpinner.style.display = 'block';
+
+                    clearTimeout(timerPesquisa);
+
+                    timerPesquisa = setTimeout(() => {
+                        // Devolve a lupa
+                        iconSpinner.style.display = 'none';
+                        iconLupa.style.display = 'block';
+                        
+                        // LÓGICA DE FILTRAGEM DINÂMICA
+                        const termo = inputPesquisa.value.toLowerCase();
+                        const cartoes = document.querySelectorAll('.product-card');
+
+                        cartoes.forEach(cartao => {
+                            const titulo = cartao.querySelector('h4').textContent.toLowerCase();
+                            const desc = cartao.querySelector('.product-details p').textContent.toLowerCase();
+
+                            // Verifica se o texto digitado existe no nome ou na descrição
+                            if (titulo.includes(termo) || desc.includes(termo)) {
+                                // Se sim, mostra o cartão com animação suave de entrada
+                                cartao.style.display = 'flex';
+                                setTimeout(() => {
+                                    cartao.style.opacity = '1';
+                                    cartao.style.transform = 'scale(1)';
+                                }, 10);
+                            } else {
+                                // Se não, oculta o cartão encolhendo-o suavemente
+                                cartao.style.opacity = '0';
+                                cartao.style.transform = 'scale(0.8)';
+                                setTimeout(() => {
+                                    // Remove do fluxo do ecrã após a animação (300ms) terminar
+                                    if (cartao.style.opacity === '0') {
+                                        cartao.style.display = 'none';
+                                    }
+                                }, 300); 
+                            }
+                        });
+                    }, 600); // 600ms de "falso carregamento" para o efeito visual ficar agradável
+                });
+            }
+
+            // Animação de clique no botão "Somente ativos"
+            const btnFiltro = document.querySelector('.toggle-active');
+            if (btnFiltro) {
+                btnFiltro.addEventListener('click', function() {
+                    this.classList.toggle('ativo');
+                    if(this.classList.contains('ativo')) {
+                        // Fica Verde para indicar que está ativado
+                        this.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                        this.style.borderColor = '#10B981';
+                        this.style.color = '#10B981';
+                    } else {
+                        // Volta ao cinzento original
+                        this.style.backgroundColor = '#181820';
+                        this.style.borderColor = '#29292E';
+                        this.style.color = '#A8A8B3';
+                    }
+                });
+            }
+        });
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 50; // Quanto menor, mais rápido a contagem
+
+            counters.forEach(counter => {
+                const animate = () => {
+                    const value = +counter.getAttribute('data-target');
+                    const data = +counter.innerText;
+                    const time = value / speed;
+
+                    if (data < value) {
+                        counter.innerText = Math.ceil(data + time);
+                        setTimeout(animate, 20); // Intervalo de atualização (ms)
+                    } else {
+                        counter.innerText = value;
+                        // Adiciona a classe que dá a "crescidinha" roxa e volta
+                        counter.classList.add('pop');
+                    }
+                }
+                animate();
+            });
+        });
+
         let produtoAtualId = null;
         let produtoAtualNome = '';
 
