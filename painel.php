@@ -39,13 +39,13 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) =>$p['quantidade'] < 10));
                 </div>
                 <nav class="nav-links">
                     <a href="painel.php" class="active">Produtos</a>
-                    <a href="#">Movimentações</a>
+                    <a href="./movimentacoes.php">Movimentações</a>
                 </nav>
             </div>
             
             <div class="topbar-right">
                 <?php if ($isAdmin): ?>
-                    <a href="novo-produto.php" class="btn-new">+ Novo produto</a>
+                    <a href="./novo-produto.php" class="btn-new">+ Novo produto</a>
                 <?php endif; ?>
                 
                 <div class="user-profile">
