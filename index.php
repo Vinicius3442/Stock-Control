@@ -60,9 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <polyline points="80,47 135,79.5 135,120" stroke="#F5F3FF" stroke-width="4" fill="none"
                     stroke-linejoin="round" stroke-linecap="round" />
 
-                <!-- Olhinhos (Pontos alinhados na face esquerda) -->
-                <circle cx="65" cy="105" r="4.5" fill="#F5F3FF" />
-                <circle cx="85" cy="117" r="4.5" fill="#F5F3FF" />
+                <!-- Olhinhos (Pontos alinhados na face esquerda) — seguem o mouse via JS -->
+                <g class="eye-blink">
+                    <circle class="box-eye" cx="65" cy="105" r="4.5" fill="#F5F3FF" />
+                </g>
+                <g class="eye-blink">
+                    <circle class="box-eye" cx="85" cy="117" r="4.5" fill="#F5F3FF" />
+                </g>
             </svg>
             <span style="color: #52525B; font-size: 0.75rem;">Pequenos detalhes. Grandes diferenças.</span>
         </div>
@@ -98,6 +102,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
     </div>
+
+    <!-- Animação: olhinhos da caixa seguem o mouse -->
+    <script>
+        (function () {
+            const svg = document.querySelector('.illustration');
+            const olhos = svg ? svg.querySelectorAll('.box-eye') : [];
+            if (!olhos.length) return;
+
+            const MAX = 2.6;          // deslocamento máximo do olho (unidades do SVG)
+            const INCLINACAO = 32 / 55; // inclinação da face esquerda da caixa (45,68 -> 100,100)
+            let mouse = null;
+            const atual = [...olhos].map(() => ({ x: 0, y: 0 }));
+
+            window.addEventListener('pointermove', (e) => { mouse = { x: e.clientX, y: e.clientY }; });
+            document.addEventListener('pointerleave', () => { mouse = null; });
+
+            function animar() {
+                const ctm = svg.getScreenCTM();
+
+                olhos.forEach((olho, i) => {
+                    let alvoX = 0, alvoY = 0;
+
+                    if (mouse && ctm) {
+                        // Centro do olho na tela
+                        const centro = svg.createSVGPoint();
+                        centro.x = +olho.getAttribute('cx');
+                        centro.y = +olho.getAttribute('cy');
+                        const tela = centro.matrixTransform(ctm);
+
+                        const dx = mouse.x - tela.x;
+                        const dy = mouse.y - tela.y;
+                        const dist = Math.hypot(dx, dy) || 1;
+                        const forca = Math.min(dist / 200, 1) * MAX; // olha menos quando o mouse está bem perto
+
+                        // Projeta a direção na face inclinada para parecer "desenhado" na caixa
+                        const ux = dx / dist, uy = dy / dist;
+                        alvoX = ux * forca;
+                        alvoY = (uy + ux * INCLINACAO) * forca * 0.85;
+                    }
+
+                    // Suaviza o movimento (interpolação)
+                    atual[i].x += (alvoX - atual[i].x) * 0.15;
+                    atual[i].y += (alvoY - atual[i].y) * 0.15;
+                    olho.setAttribute('transform', `translate(${atual[i].x.toFixed(2)} ${atual[i].y.toFixed(2)})`);
+                });
+
+                requestAnimationFrame(animar);
+            }
+
+            requestAnimationFrame(animar);
+        })();
+    </script>
 </body>
 
 </html>

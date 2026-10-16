@@ -191,14 +191,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <!-- Coluna Direita -->
                 <div class="form-panel">
                     <h3>Imagem do produto (Opcional)</h3>
-                    <div class="image-upload-box" style="cursor: pointer;"
-                        onclick="document.getElementById('upload-img').click();">
-                        <span style="font-size: 24px; margin-bottom: 8px;">&uarr;</span>
-                        <p>Clique para selecionar sua imagem</p>
-                    </div>
-                    <!-- Input oculto, acionado pelo clique na caixa acima -->
-                    <label style="display:block; margin-bottom: 8px; font-size: 0.875rem; color: #E1E1E6;">Imagem do
-                        produto (Opcional)</label>
 
                     <div class="image-upload-box" id="upload-box"
                         onclick="document.getElementById('imagem_produto').click()">

@@ -63,6 +63,28 @@ body {
   width: 250px;
 }
 
+/* Piscadinha dos olhos da caixa (o movimento de seguir o mouse fica no index.php) */
+.illustration .eye-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: boxBlink 4.5s infinite;
+}
+
+@keyframes boxBlink {
+  0%, 92%, 100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .illustration .eye-blink {
+    animation: none;
+  }
+}
+
 .right-panel {
   width: 50%;
   display: flex;
@@ -766,11 +788,6 @@ a.btn-primary:hover {
   font-size: 0.875rem;
   border-bottom: 1px solid #29292e;
   color: #e1e1e6;
-}
-
-.history-table tr:last-child td {
-  border-bottom: none;
-  padding-bottom: 0;
 }
 
 /* Filtro e Ações do Histórico */
