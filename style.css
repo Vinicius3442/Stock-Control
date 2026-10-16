@@ -168,6 +168,16 @@ body {
   padding: 24px 0;
   border-bottom: 1px solid #29292e;
   margin-bottom: 40px;
+  /* Header fixo no topo acompanhando o scroll */
+  position: sticky;
+  top: 0;
+  z-index: 100; /* acima dos menus dos cards (10), abaixo dos modais (1000) */
+  background-color: rgba(14, 14, 16, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  /* Estende o fundo para a largura toda da tela, sem mudar o alinhamento do conteúdo */
+  box-shadow: 0 0 0 100vmax rgba(14, 14, 16, 0.85);
+  clip-path: inset(0 -100vmax);
 }
 
 .topbar-left {
@@ -191,16 +201,6 @@ body {
   display: flex;
   align-items: center;
   gap: 24px;
-}
-
-.btn-new {
-  background-color: #7c3aed;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 600;
 }
 
 .user-profile {

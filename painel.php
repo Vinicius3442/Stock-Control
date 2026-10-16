@@ -61,10 +61,6 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
             </div>
 
             <div class="topbar-right">
-                <?php if (isset($isAdmin) && $isAdmin && basename($_SERVER['PHP_SELF']) == 'painel.php'): ?>
-                    <a href="./novo-produto.php" class="btn-new"><i class="ph ph-plus"></i> Novo produto</a>
-                <?php endif; ?>
-
                 <a href="perfil.php" style="text-decoration: none;">
                     <div class="user-profile" style="transition: transform 0.2s ease; cursor: pointer;"
                         onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
