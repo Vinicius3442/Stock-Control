@@ -127,11 +127,9 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
                 </div>
             </section>
 
-            <!-- Barra de Busca e Filtro (Centralizada e Roxinha) -->
+            <!-- Barra de Busca (esquerda) e Ações (direita) -->
             <section class="filters-section">
-                <div class="filters-left"></div>
-
-                <div class="filters-center">
+                <div class="filters-left">
                     <div class="search-container">
                         <i class="ph ph-magnifying-glass search-icon" id="icon-lupa"></i>
                         <i class="ph ph-spinner-gap search-icon loading-spinner" id="icon-spinner"
@@ -143,6 +141,12 @@ $estoqueBaixo = count(array_filter($produtos, fn($p) => $p['quantidade'] < 10));
 
                 <div class="filters-right">
                     <button class="toggle-active"><i class="ph ph-funnel"></i> Somente ativos</button>
+
+                    <?php if ($isAdmin): ?>
+                        <a href="novo-produto.php" class="btn-add-product">
+                            <i class="ph ph-plus"></i> Adicionar produto
+                        </a>
+                    <?php endif; ?>
                 </div>
             </section>
 
